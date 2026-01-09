@@ -1,0 +1,43 @@
+{
+  "bot": {
+    "name": "scales.bot",
+    "status": "online",
+    "activity": {
+      "type": "playing",
+      "text": "ScalesJr on YouTube"
+    }
+  },
+  "commands": {
+    "sync_scope": "guild",
+    "ephemeral_errors": true,
+    "allowed_guild_ids": [],
+    "allowed_channel_ids": [],
+    "disable_in_dms": true
+  },
+  "personality": {
+    "roast_cooldown_seconds": 8,
+    "roasts": [
+      "You bring a lot to the table — mostly noise.",
+      "If confidence was competence, you'd be unstoppable. Unfortunately.",
+      "You're not dumb. You just have aggressively bad ideas.",
+      "You're like a software update: nobody asked, and everything got worse.",
+      "You bring everyone so much joy! You know, when you leave the room. But, still.",
+      "Someday you’ll go far. And I really hope you stay there.",
+      "You have something on your chin... no, the third one down.",
+      "You're like a cloud. When you disappear, it's a beautiful day.",
+      "You are the human version of period cramps."
+      
+    
+    ],
+    "self_roast": "Roasting yourself? Respect. Still weird.",
+    "bot_roast": "Pick on someone who can feel shame.",
+    "cooldown_msg": "Cooldown. Stop mashing buttons.",
+    "no_perms_msg": "No perms. Sit down.",
+    "blocked_output_msg": "Nope. Not saying that.",
+    "max_say_length": 1500,
+    "banned_substrings": []
+  },
+  "limits": {
+    "purge_max": 100
+  }
+}
