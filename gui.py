@@ -13,6 +13,11 @@ APP_TITLE = "Scales Bot Controller"
 BOT_SCRIPT = "bot.py"
 REQ_FILE = "requirements.txt"
 
+# Place one of these in the same folder as gui.py to override the window/taskbar icon.
+# Windows strongly prefers .ico for best results.
+ICON_ICO = "icon.ico"
+ICON_PNG = "icon.png"
+
 
 def project_root() -> str:
     return os.path.dirname(os.path.abspath(__file__))
@@ -37,6 +42,19 @@ def open_path(path: str) -> None:
         pass
 
 
+def try_set_windows_app_user_model_id(app_id: str) -> None:
+    """Helps Windows group the taskbar icon under a stable identity (instead of python.exe)."""
+    if not is_windows():
+        return
+    try:
+        import ctypes  # noqa: PLC0415
+
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(app_id)
+    except Exception:
+        # Non-fatal.
+        pass
+
+
 class BotControllerGUI:
     def __init__(self, root: tk.Tk):
         self.root = root
@@ -44,6 +62,10 @@ class BotControllerGUI:
         self.root.minsize(900, 520)
 
         self.root_dir = project_root()
+        # Keep a reference to avoid Tk photo images being garbage-collected.
+        self._icon_image_ref: tk.PhotoImage | None = None
+        self._apply_window_icon()
+
         self.proc: subprocess.Popen[str] | None = None
         self._proc_lock = threading.Lock()
         self.reader_thread: threading.Thread | None = None
@@ -69,6 +91,33 @@ class BotControllerGUI:
             self.start_bot()
 
     # ---------------- UI ----------------
+
+    def _apply_window_icon(self) -> None:
+        """Set top-left/titlebar icon and taskbar icon.
+
+        Usage:
+          - Put 'icon.ico' (recommended on Windows) OR 'icon.png' in the same folder as gui.py.
+        """
+        ico_path = os.path.join(self.root_dir, ICON_ICO)
+        png_path = os.path.join(self.root_dir, ICON_PNG)
+
+        # Best for Windows: .ico via iconbitmap
+        if is_windows() and os.path.exists(ico_path):
+            try:
+                self.root.iconbitmap(ico_path)
+                return
+            except Exception:
+                # Fall back to png below
+                pass
+
+        # Cross-platform fallback: .png via iconphoto
+        if os.path.exists(png_path):
+            try:
+                img = tk.PhotoImage(file=png_path)
+                self.root.iconphoto(True, img)
+                self._icon_image_ref = img
+            except Exception:
+                pass
 
     def _build_ui(self) -> None:
         self.root.columnconfigure(0, weight=1)
@@ -413,6 +462,9 @@ class BotControllerGUI:
 
 
 def main() -> None:
+    # Helps Windows show a distinct taskbar identity/icon instead of grouping under python.exe.
+    try_set_windows_app_user_model_id("scales.bot.controller")
+
     root = tk.Tk()
 
     # A little nicer default padding/appearance
